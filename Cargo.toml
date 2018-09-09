@@ -1,0 +1,8 @@
+[package]
+name = "sudoku"
+version = "0.1.0"
+authors = ["Spencer Christiansen <jc.spencer92@gmail.com>"]
+
+[dependencies]
+slab = "0.4.0"
+rand = "0.5.5"

@@ -1,8 +1,8 @@
-extern crate slab;
 extern crate rand;
+extern crate slab;
 
-use slab::Slab;
 use rand::Rng;
+use slab::Slab;
 
 #[derive(Debug, PartialEq, Eq)]
 enum Knowing {
@@ -13,14 +13,14 @@ enum Knowing {
 
 #[derive(Debug, Clone, Copy)]
 struct Node {
-    li: usize, // The index of the node to the left
-    ri: usize, // ... to the right
-    ui: usize, // ... up
-    di: usize, // ... down
-    ci: usize, // The index of the column header
-    size: usize, // The number of nodes in the column (only use for column headers)
+    li: usize,      // The index of the node to the left
+    ri: usize,      // ... to the right
+    ui: usize,      // ... up
+    di: usize,      // ... down
+    ci: usize,      // The index of the column header
+    size: usize,    // The number of nodes in the column (only use for column headers)
     id: [usize; 3], // The row, column, and number represented by the node in the Sudoku puzzle
-    i: usize, // The index of the node, so it can tell others
+    i: usize,       // The index of the node, so it can tell others
 }
 
 // Store the dancing links
@@ -70,7 +70,15 @@ impl Node {
         }
     }
 
-    fn new_link(li: usize, ri: usize, ui: usize, di: usize, ci: usize, i: usize, id: [usize; 3]) -> Self {
+    fn new_link(
+        li: usize,
+        ri: usize,
+        ui: usize,
+        di: usize,
+        ci: usize,
+        i: usize,
+        id: [usize; 3],
+    ) -> Self {
         Node {
             li,
             ri,
@@ -85,7 +93,6 @@ impl Node {
 }
 
 impl SudokuWeb {
-
     // `belts`: The number of rows of big boxes (each with the same number of rows of individual
     // cells).
     // `curtains`: The number of columns of big boxes (each with the same number of columns of
@@ -159,7 +166,7 @@ impl SudokuWeb {
             for i in 1..=nums {
                 for j in 1..=nums {
                     let key = {
-                        let n = case_index*nums*nums + (i-1)*nums + j;
+                        let n = case_index * nums * nums + (i - 1) * nums + j;
 
                         let entry = self.slab.vacant_entry();
                         let key = entry.key();
@@ -188,12 +195,12 @@ impl SudokuWeb {
 
     fn indices_from_rcn(&self, r: usize, c: usize, n: usize) -> Vec<usize> {
         let nums = self.symbols();
-        let block = ((r-1) / self.curtains) * self.curtains + ((c-1) / self.belts) + 1;
+        let block = ((r - 1) / self.curtains) * self.curtains + ((c - 1) / self.belts) + 1;
 
-        let cell_constraint = (r-1)*nums + c;
-        let row_constraint = nums*nums + (r-1)*nums + n;
-        let col_constraint = 2*nums*nums + (c-1)*nums + n;
-        let block_constraint = 3*nums*nums + (block-1)*nums + n;
+        let cell_constraint = (r - 1) * nums + c;
+        let row_constraint = nums * nums + (r - 1) * nums + n;
+        let col_constraint = 2 * nums * nums + (c - 1) * nums + n;
+        let block_constraint = 3 * nums * nums + (block - 1) * nums + n;
 
         // for i in 1..=(4*nums*nums) {
         //     let a = 1 + ((i-1) % nums);
@@ -208,7 +215,12 @@ impl SudokuWeb {
         // }
         // print!("\n");
 
-        vec![cell_constraint, row_constraint, col_constraint, block_constraint]
+        vec![
+            cell_constraint,
+            row_constraint,
+            col_constraint,
+            block_constraint,
+        ]
     }
 
     // Given the key to a freshly created node, make sure it's neighbors point to it
@@ -329,7 +341,7 @@ impl SudokuWeb {
             if self.solution_count > 1 {
                 self.uniq = Knowing::No;
             }
-            return
+            return;
         }
 
         let c = self.choose_column(rand);
@@ -348,7 +360,7 @@ impl SudokuWeb {
                 j = self.at(j.ri);
             }
 
-            self.dance(k+1, seek, print, rand);
+            self.dance(k + 1, seek, print, rand);
 
             self.prop_solution.pop();
 
@@ -460,17 +472,25 @@ impl SudokuWeb {
         print!("{}", ls);
         for _ in 1..self.curtains {
             for _ in 1..self.belts {
-                for _ in 0..sym_width { print!("{}", h); }
+                for _ in 0..sym_width {
+                    print!("{}", h);
+                }
                 print!("{}", tm);
             }
-            for _ in 0..sym_width { print!("{}", h); }
+            for _ in 0..sym_width {
+                print!("{}", h);
+            }
             print!("{}", bm);
         }
-            for _ in 1..self.belts {
-                for _ in 0..sym_width { print!("{}", h); }
-                print!("{}", tm);
+        for _ in 1..self.belts {
+            for _ in 0..sym_width {
+                print!("{}", h);
             }
-            for _ in 0..sym_width { print!("{}", h); }
+            print!("{}", tm);
+        }
+        for _ in 0..sym_width {
+            print!("{}", h);
+        }
         println!("{}", rs);
     }
 
@@ -486,7 +506,7 @@ impl SudokuWeb {
                 sym_width = n.len();
             }
 
-            a[r-1][c-1] = n;
+            a[r - 1][c - 1] = n;
         }
 
         for (r_i, r) in a.iter().enumerate() {
@@ -499,8 +519,14 @@ impl SudokuWeb {
             }
             for (c_i, c) in r.iter().enumerate() {
                 let mut cc = c.clone();
-                for _ in 0..(sym_width - c.len()) { cc.insert(0, ' '); }
-                if c_i % self.belts == 0 { print!("║"); } else { print!("│"); }
+                for _ in 0..(sym_width - c.len()) {
+                    cc.insert(0, ' ');
+                }
+                if c_i % self.belts == 0 {
+                    print!("║");
+                } else {
+                    print!("│");
+                }
                 print!("{}", cc);
             }
             println!("║");
@@ -534,6 +560,22 @@ impl SudokuWeb {
             }
         }
     }
+
+    fn prop_solution_string(&self) -> String {
+        let nums = self.symbols();
+
+        (1..=nums)
+            .flat_map(|r| {
+                (1..=nums).map(move |c| {
+                    self.prop_solution
+                        .iter()
+                        .find(|e| e[0] == r && e[1] == c)
+                        .map(|e| e[2].to_string())
+                        .unwrap_or_else(|| ".".to_string())
+                })
+            })
+            .collect()
+    }
 }
 
 fn main() {
@@ -550,12 +592,26 @@ fn main() {
     // let mut min = usize::max_value();
     // let mut min_sol = sw.prop_solution.clone();
 
+    let mut min = 81;
+    let mut min_prop = sw.prop_solution.clone();
     for _ in 0..100 {
         sw.random_puzzle();
+        println!("prop_solution string: {}", sw.prop_solution_string());
         let len = sw.prop_solution.len();
+        if len < min {
+            min = len;
+            min_prop = sw.prop_solution.clone();
+        }
         counts.push(len);
     }
-    // sw.print_solution(&sw.solution);
+    println!("Min hints: {}", min);
+    sw.prop_solution = min_prop;
+    sw.solve(2, false, false);
+    sw.print_solution(&sw.prop_solution);
+    sw.print_solution(&sw.solution);
+
+    println!("prop_solution: {:?}", sw.prop_solution);
+    println!("prop_solution string: {}", sw.prop_solution_string());
 
     // let mut count = 0;
     // while min > 19 {
@@ -585,7 +641,6 @@ fn main() {
 
     // sw.solve(1, true, false);
 
-
     // // Find a puzzle that's valid for 3x2 and 2x3
     // let mut swa = SudokuWeb::new(2, 3);
     // let mut swb = SudokuWeb::new(3, 2);
@@ -602,7 +657,6 @@ fn main() {
 
     // swa.print_solution(&swa.solution);
     // swb.print_solution(&swb.solution);
-
 
     // swa.prop_solution = swa.solution.clone();
     // let os = swa.solution.clone();
